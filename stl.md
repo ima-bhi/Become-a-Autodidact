@@ -492,16 +492,3 @@ vector<int> a(n);
 
 ---
 
-## 🧠 FINAL MENTAL CHEAT SHEET (MEMORIZE)
-
-```
-Index → vector
-Sorted unique → set
-Sorted duplicate → multiset
-Key-value sorted → map
-Fast frequency → unordered_map
-Always min/max → priority_queue
-FIFO → queue
-LIFO → stack
-Sliding window → deque
-```
