@@ -1,0 +1,414 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--syne:'Syne',sans-serif;--mono:'JetBrains Mono',monospace}
+  body{font-family:var(--syne);background:transparent;color:var(--color-text-primary)}
+  .wrap{padding:1.5rem 0 3rem}
+  .hero{margin-bottom:2.5rem}
+  .hero-label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:.5rem}
+  .hero-title{font-size:28px;font-weight:800;line-height:1.1;letter-spacing:-.02em;margin-bottom:.75rem}
+  .hero-sub{font-size:14px;color:var(--color-text-secondary);line-height:1.6;max-width:560px}
+  .pill{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;padding:4px 10px;border-radius:999px;margin-right:6px;margin-top:.5rem}
+  .pill-blue{background:#e6f1fb;color:#0c447c}.pill-green{background:#eaf3de;color:#27500a}.pill-amber{background:#faeeda;color:#633806}
+  .phases{display:flex;flex-direction:column;gap:1.5rem}
+  .phase{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden}
+  .phase-header{padding:1rem 1.25rem;cursor:pointer;display:flex;align-items:center;gap:12px;user-select:none;transition:background .15s}
+  .phase-header:hover{background:var(--color-background-secondary)}
+  .phase-num{font-family:var(--mono);font-size:11px;font-weight:500;padding:3px 8px;border-radius:4px;flex-shrink:0}
+  .ph1 .phase-num{background:#eaf3de;color:#3b6d11}
+  .ph2 .phase-num{background:#e6f1fb;color:#185fa5}
+  .ph3 .phase-num{background:#faeeda;color:#854f0b}
+  .phase-htitle{font-size:15px;font-weight:700;letter-spacing:-.01em;flex:1}
+  .phase-meta{font-size:12px;color:var(--color-text-tertiary);font-family:var(--mono)}
+  .chevron{font-size:18px;color:var(--color-text-tertiary);transition:transform .25s}
+  .phase.open .chevron{transform:rotate(180deg)}
+  .phase-body{display:none;padding:0 1.25rem 1.25rem}
+  .phase.open .phase-body{display:block}
+  .phase-goal{font-size:13px;color:var(--color-text-secondary);padding:.75rem 1rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-bottom:1rem;line-height:1.5}
+  .weeks{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:.75rem}
+  .week{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:.875rem 1rem;cursor:pointer;transition:border-color .15s}
+  .week:hover{border-color:var(--color-border-primary)}
+  .week.expanded{border-color:var(--color-border-secondary)}
+  .week-top{display:flex;align-items:flex-start;gap:10px}
+  .week-dot{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:500;flex-shrink:0;margin-top:1px}
+  .ph1 .week-dot{background:#eaf3de;color:#3b6d11}
+  .ph2 .week-dot{background:#e6f1fb;color:#185fa5}
+  .ph3 .week-dot{background:#faeeda;color:#854f0b}
+  .week-info{flex:1}
+  .week-title{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px}
+  .week-goal{font-size:12px;color:var(--color-text-secondary);line-height:1.4}
+  .week-details{display:none;margin-top:.875rem;padding-top:.875rem;border-top:0.5px solid var(--color-border-tertiary)}
+  .week.expanded .week-details{display:block}
+  .detail-section{margin-bottom:.75rem}
+  .detail-section:last-child{margin-bottom:0}
+  .detail-label{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:.4rem}
+  .day-row{display:flex;gap:8px;margin-bottom:.35rem;align-items:flex-start}
+  .day-tag{font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:3px;background:var(--color-background-secondary);color:var(--color-text-secondary);flex-shrink:0;margin-top:1px}
+  .day-task{font-size:12px;color:var(--color-text-primary);line-height:1.45}
+  .skill-chip{display:inline-flex;align-items:center;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:3px;background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-secondary);margin:2px 2px 2px 0}
+  .milestone{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem;margin-top:.75rem;border-left:3px solid}
+  .ph1 .milestone{border-color:#639922}.ph2 .milestone{border-color:#378add}.ph3 .milestone{border-color:#ba7517}
+  .milestone-title{font-size:12px;font-weight:700;margin-bottom:.25rem}
+  .milestone-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.45}
+  .rule-bar{display:flex;align-items:center;gap:.75rem;padding:.875rem 1.25rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md);margin-top:2rem;border:0.5px solid var(--color-border-tertiary)}
+  .rule-icon{font-size:18px;color:var(--color-text-tertiary)}
+  .rule-text{font-size:13px;font-weight:500}
+  .rule-sub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+  .courses-section{margin-top:2rem}
+  .courses-title{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:.75rem}
+  .courses-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.5rem}
+  .course-item{padding:.625rem .875rem;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);font-size:12px;line-height:1.4}
+  .course-name{font-weight:500;margin-bottom:2px}
+  .course-provider{font-family:var(--mono);font-size:10px;color:var(--color-text-tertiary)}
+  .free-badge{display:inline-block;font-family:var(--mono);font-size:9px;padding:1px 5px;border-radius:2px;background:#eaf3de;color:#3b6d11;margin-left:5px;vertical-align:middle}
+</style>
+
+<div class="wrap">
+  <h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">6-month agentic AI curriculum for senior backend engineers</h2>
+
+  <div class="hero">
+    <p class="hero-label">6-month learning plan</p>
+    <h1 class="hero-title">Agentic AI<br>Engineering Path</h1>
+    <p class="hero-sub">Structured for senior backend engineers. 1 hour/day, every day. Ends with a shipped product.</p>
+    <div>
+      <span class="pill pill-blue"><i class="ti ti-clock" aria-hidden="true"></i> 1hr/day</span>
+      <span class="pill pill-green"><i class="ti ti-code" aria-hidden="true"></i> code every week</span>
+      <span class="pill pill-amber"><i class="ti ti-rocket" aria-hidden="true"></i> ship in month 6</span>
+    </div>
+  </div>
+
+  <div class="phases" id="phases"></div>
+
+  <div class="rule-bar">
+    <i class="ti ti-git-commit rule-icon" aria-hidden="true"></i>
+    <div>
+      <div class="rule-text">One non-negotiable rule</div>
+      <div class="rule-sub">Every week ends with pushed code on GitHub. No exceptions.</div>
+    </div>
+  </div>
+
+  <div class="courses-section">
+    <p class="courses-title">Parallel free courses — do 1–2 per month</p>
+    <div class="courses-grid">
+      <div class="course-item"><div class="course-name">AI Agents in LangGraph<span class="free-badge">free</span></div><div class="course-provider">DeepLearning.AI</div></div>
+      <div class="course-item"><div class="course-name">Building Agentic RAG<span class="free-badge">free</span></div><div class="course-provider">DeepLearning.AI</div></div>
+      <div class="course-item"><div class="course-name">Multi AI Agent Systems<span class="free-badge">free</span></div><div class="course-provider">DeepLearning.AI</div></div>
+      <div class="course-item"><div class="course-name">Function Calling<span class="free-badge">free</span></div><div class="course-provider">DeepLearning.AI</div></div>
+      <div class="course-item"><div class="course-name">LangGraph course<span class="free-badge">free</span></div><div class="course-provider">LangChain Academy</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {
+    phase: 1, label: "Phase 1", cls: "ph1",
+    title: "Foundations",
+    months: "Month 1–2",
+    goal: "Understand the core before touching frameworks. Build intuition, not just syntax.",
+    milestone: {title: "Mini Project #1 — Personal Research Assistant", desc: "Takes a topic → searches the web → summarizes results → remembers past queries. Tests: Tool calling + RAG + Memory + ReAct."},
+    weeks: [
+      {
+        n:"W1", title:"LLM Basics + API Setup",
+        goal:"Call your first LLM, understand tokens, roles, context",
+        days:[
+          {tag:"Mon–Tue", task:"Watch: How LLMs work — Andrej Karpathy (split across 2 days)"},
+          {tag:"Wed–Thu", task:"Code: Set up Claude or OpenAI API, send first message via SDK"},
+          {tag:"Fri–Sat", task:"Build: Simple Q&A bot — no framework, raw API only"},
+          {tag:"Sun", task:"Review + write down what confused you"}
+        ],
+        skills:["tokens","roles","context window","API auth"]
+      },
+      {
+        n:"W2", title:"Prompt Engineering",
+        goal:"Control LLM output reliably and predictably",
+        days:[
+          {tag:"Mon–Tue", task:"Read: Anthropic Prompt Engineering Guide (full)"},
+          {tag:"Wed–Thu", task:"Practice: System prompts, few-shot examples, chain-of-thought"},
+          {tag:"Fri–Sun", task:"Build: A reusable prompt template system for your product idea"}
+        ],
+        skills:["system prompts","few-shot","CoT","output control"]
+      },
+      {
+        n:"W3", title:"Tool Calling",
+        goal:"LLM decides what action to take — the core of agents",
+        days:[
+          {tag:"Mon–Tue", task:"Read: Claude Tool Use Docs — understand schema, flow"},
+          {tag:"Wed–Thu", task:"Code: Give LLM 2–3 tools (search, calculator, weather API)"},
+          {tag:"Fri–Sun", task:"Build: Bot that picks the right tool from user intent"}
+        ],
+        skills:["tool schema","tool selection","multi-tool","JSON output"]
+      },
+      {
+        n:"W4", title:"Agent Memory",
+        goal:"Give agents short-term and long-term memory",
+        days:[
+          {tag:"Mon–Tue", task:"Read: Types of memory — in-context, external DB, vector stores"},
+          {tag:"Wed–Thu", task:"Code: Add conversation history to your bot (in-context memory)"},
+          {tag:"Fri–Sun", task:"Build: Save user preferences to a file or DB (long-term memory)"}
+        ],
+        skills:["in-context memory","persistent storage","memory types"]
+      },
+      {
+        n:"W5", title:"ReAct Pattern",
+        goal:"Implement the fundamental agent loop from scratch",
+        days:[
+          {tag:"Mon–Tue", task:"Read: ReAct paper summary — reason + act cycle"},
+          {tag:"Wed–Thu", task:"Code: Implement ReAct loop from scratch, no framework"},
+          {tag:"Fri–Sun", task:"Build: Agent that reasons step-by-step before acting"}
+        ],
+        skills:["reason+act","agent loop","scratchpad","no-framework"]
+      },
+      {
+        n:"W6", title:"Vector DBs + RAG",
+        goal:"Let agents search and retrieve from their own knowledge base",
+        days:[
+          {tag:"Mon–Tue", task:"Read: What is RAG, vector DBs, embeddings — concepts only"},
+          {tag:"Wed–Thu", task:"Code: Set up ChromaDB or Supabase, embed some documents"},
+          {tag:"Fri–Sun", task:"Build: RAG bot that answers questions from your own docs"}
+        ],
+        skills:["embeddings","vector search","chunking","retrieval"]
+      },
+      {
+        n:"W7", title:"Error Handling + Reliability",
+        goal:"Agents will fail — build for it (your backend skills shine here)",
+        days:[
+          {tag:"Mon–Tue", task:"Study: Retry logic, fallback prompts, output validation patterns"},
+          {tag:"Wed–Thu", task:"Code: Add retry + structured output parsing to your agent"},
+          {tag:"Fri–Sun", task:"Refactor W5–W6 agent to be production-safe"}
+        ],
+        skills:["retry logic","Pydantic","structured outputs","fallbacks"]
+      },
+      {
+        n:"W8", title:"Mini Project #1",
+        goal:"Ship something end-to-end — no tutorials, just build",
+        days:[
+          {tag:"Mon–Wed", task:"Build the web search + summarise pipeline"},
+          {tag:"Thu–Fri", task:"Add memory for past queries"},
+          {tag:"Sat–Sun", task:"Polish, test failure cases, push to GitHub"}
+        ],
+        skills:["integration","Tavily/SerpAPI","end-to-end","GitHub push"]
+      }
+    ]
+  },
+  {
+    phase: 2, label: "Phase 2", cls: "ph2",
+    title: "Agent Architecture",
+    months: "Month 3–4",
+    goal: "Learn production frameworks, multi-agent patterns, observability, and testing.",
+    milestone: {title: "Mini Project #2 — Multi-Agent Content Pipeline", desc: "Topic in → Researcher agent gathers → Writer agent drafts → Critic agent reviews → Polished article out. Tests: LangGraph + Multi-agent + Reflection."},
+    weeks: [
+      {
+        n:"W9", title:"LangGraph Fundamentals",
+        goal:"The best framework for production agents",
+        days:[
+          {tag:"Mon–Tue", task:"Read: LangGraph Docs Intro — nodes, edges, state"},
+          {tag:"Wed–Thu", task:"Code: Rebuild your Week 5 ReAct agent in LangGraph"},
+          {tag:"Fri–Sun", task:"Understand: Checkpointing, state persistence, graph topology"}
+        ],
+        skills:["nodes","edges","state","checkpointing"]
+      },
+      {
+        n:"W10", title:"LangGraph Advanced",
+        goal:"Conditional flows and human-in-the-loop",
+        days:[
+          {tag:"Mon–Tue", task:"Study: Conditional edges, branching logic in graphs"},
+          {tag:"Wed–Thu", task:"Code: Add human approval step before agent takes action"},
+          {tag:"Fri–Sun", task:"Build: Workflow that pauses and waits for user confirmation"}
+        ],
+        skills:["conditional edges","HITL","interrupts","branching"]
+      },
+      {
+        n:"W11", title:"Multi-Agent Systems",
+        goal:"Multiple agents collaborating on a single task",
+        days:[
+          {tag:"Mon–Tue", task:"Read: Supervisor pattern — how agents delegate to workers"},
+          {tag:"Wed–Thu", task:"Code: Build 2-agent system — Planner + Executor"},
+          {tag:"Fri–Sun", task:"Study: CrewAI concepts — understand the pattern, don't need to use it"}
+        ],
+        skills:["supervisor pattern","handoff","agent communication","delegation"]
+      },
+      {
+        n:"W12", title:"MCP — Model Context Protocol",
+        goal:"The emerging standard — critical for 2025+",
+        days:[
+          {tag:"Mon–Tue", task:"Read: What is MCP and why it matters (official docs)"},
+          {tag:"Wed–Thu", task:"Code: Build a simple MCP server that exposes a tool"},
+          {tag:"Fri–Sun", task:"Connect your MCP server to Claude Desktop or your agent"}
+        ],
+        skills:["MCP server","tool exposure","Claude Desktop","protocol"]
+      },
+      {
+        n:"W13", title:"Observability + Monitoring",
+        goal:"Know what your agent is doing in production",
+        days:[
+          {tag:"Mon–Tue", task:"Setup: LangSmith free tier — create project, get key"},
+          {tag:"Wed–Thu", task:"Code: Add tracing to your existing agents"},
+          {tag:"Fri–Sun", task:"Practice: Debug a failing agent run from trace data"}
+        ],
+        skills:["LangSmith","tracing","spans","debug from logs"]
+      },
+      {
+        n:"W14", title:"Structured Outputs + Evals",
+        goal:"Test agents the way you'd test a distributed system",
+        days:[
+          {tag:"Mon–Tue", task:"Read: How to eval LLM outputs — not unit tests, eval frameworks"},
+          {tag:"Wed–Thu", task:"Code: Write evals for your research assistant agent"},
+          {tag:"Fri–Sun", task:"Setup: Basic CI check that runs agent evals on push"}
+        ],
+        skills:["RAGAS","DeepEval","CI evals","output scoring"]
+      },
+      {
+        n:"W15", title:"Agentic Patterns Deep Dive",
+        goal:"Know which pattern to use and when",
+        days:[
+          {tag:"Mon–Tue", task:"Study + implement: Reflection — agent critiques its own output"},
+          {tag:"Wed–Thu", task:"Study + implement: Planning — agent breaks task into subtasks"},
+          {tag:"Fri–Sun", task:"Study + implement: Tool augmentation — give agents code execution"}
+        ],
+        skills:["reflection","planning","code execution","pattern selection"]
+      },
+      {
+        n:"W16", title:"Mini Project #2",
+        goal:"Multi-agent pipeline — ship it",
+        days:[
+          {tag:"Mon–Tue", task:"Build Researcher + Writer agents in LangGraph"},
+          {tag:"Wed–Thu", task:"Add Critic agent with reflection loop"},
+          {tag:"Fri–Sun", task:"Wire together, test edge cases, push to GitHub"}
+        ],
+        skills:["full pipeline","multi-agent","reflection","LangGraph"]
+      }
+    ]
+  },
+  {
+    phase: 3, label: "Phase 3", cls: "ph3",
+    title: "Product Building",
+    months: "Month 5–6",
+    goal: "Build YOUR product, not tutorials. Use everything you learned.",
+    milestone: {title: "Launch day", desc: "Deploy to Railway/Render/Fly.io → write README + docs → share on LinkedIn with a demo video."},
+    weeks: [
+      {
+        n:"W17", title:"Define Your Product",
+        goal:"1 hour, no coding — answer 4 key questions in a doc",
+        days:[
+          {tag:"Full week", task:"Answer: What problem does it solve? Who is the user? What does the agent do a regular app can't? What tools/APIs does it need?"}
+        ],
+        skills:["problem definition","user clarity","agent value","API mapping"]
+      },
+      {
+        n:"W18", title:"Product Architecture",
+        goal:"Design before you build",
+        days:[
+          {tag:"Mon–Tue", task:"Design: Agent graph — what nodes and agents exist"},
+          {tag:"Wed–Thu", task:"Design: Tools, APIs, memory strategy"},
+          {tag:"Fri–Sun", task:"Design: User interface — API? CLI? Web? Pick one and commit"}
+        ],
+        skills:["system design","FastAPI","Vercel AI SDK","interface choice"]
+      },
+      {
+        n:"W19–20", title:"Core Agent Build",
+        goal:"Build the heart of your product",
+        days:[
+          {tag:"Daily", task:"0:00–0:10 Review + plan today's task"},
+          {tag:"Daily", task:"0:10–0:50 Build the main agent loop + primary tools"},
+          {tag:"Daily", task:"0:50–1:00 Push to GitHub + write 2-line note on what you did"}
+        ],
+        skills:["agent loop","tool integration","daily shipping","GitHub discipline"]
+      },
+      {
+        n:"W21–22", title:"Integrations + API Layer",
+        goal:"Wrap your agent in a production-ready backend",
+        days:[
+          {tag:"W21", task:"Wrap agent in FastAPI — add auth using your existing backend skills"},
+          {tag:"W21", task:"Connect external APIs your product needs"},
+          {tag:"W22", task:"Add error handling, retries, rate limiting"}
+        ],
+        skills:["FastAPI","auth","external APIs","production hardening"]
+      },
+      {
+        n:"W23", title:"Testing + Evals",
+        goal:"Find and fix the top failure modes",
+        days:[
+          {tag:"Mon–Wed", task:"Write evals for your core agent flows"},
+          {tag:"Thu–Fri", task:"Fix the top 3 failure modes you discover"},
+          {tag:"Sat–Sun", task:"Add LangSmith tracing to production flows"}
+        ],
+        skills:["evals","failure modes","LangSmith","production traces"]
+      },
+      {
+        n:"W24", title:"Deploy + Launch",
+        goal:"Ship it publicly",
+        days:[
+          {tag:"Mon–Tue", task:"Deploy to Railway, Render, or Fly.io"},
+          {tag:"Wed–Thu", task:"Write README + basic API docs"},
+          {tag:"Fri–Sun", task:"Record demo video → share on LinkedIn"}
+        ],
+        skills:["Railway/Render","Docker","README","demo video","LinkedIn"]
+      }
+    ]
+  }
+];
+
+function renderPhases() {
+  const container = document.getElementById('phases');
+  DATA.forEach((p, pi) => {
+    const div = document.createElement('div');
+    div.className = `phase ${p.cls}`;
+    if (pi === 0) div.classList.add('open');
+    div.innerHTML = `
+      <div class="phase-header" onclick="togglePhase(this)">
+        <span class="phase-num">${p.label}</span>
+        <span class="phase-htitle">${p.title}</span>
+        <span class="phase-meta">${p.months}</span>
+        <i class="ti ti-chevron-down chevron" aria-hidden="true"></i>
+      </div>
+      <div class="phase-body">
+        <p class="phase-goal">${p.goal}</p>
+        <div class="weeks">
+          ${p.weeks.map((w,wi) => `
+            <div class="week" onclick="toggleWeek(this)">
+              <div class="week-top">
+                <span class="week-dot">${w.n}</span>
+                <div class="week-info">
+                  <div class="week-title">${w.title}</div>
+                  <div class="week-goal">${w.goal}</div>
+                </div>
+                <i class="ti ti-chevron-down chevron" style="font-size:14px;margin-top:4px" aria-hidden="true"></i>
+              </div>
+              <div class="week-details">
+                <div class="detail-section">
+                  <div class="detail-label">Daily plan</div>
+                  ${w.days.map(d => `<div class="day-row"><span class="day-tag">${d.tag}</span><span class="day-task">${d.task}</span></div>`).join('')}
+                </div>
+                <div class="detail-section">
+                  <div class="detail-label">Skills covered</div>
+                  ${w.skills.map(s => `<span class="skill-chip">${s}</span>`).join('')}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        <div class="milestone">
+          <div class="milestone-title"><i class="ti ti-flag" aria-hidden="true" style="margin-right:5px"></i>${p.milestone.title}</div>
+          <div class="milestone-desc">${p.milestone.desc}</div>
+        </div>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function togglePhase(header) {
+  header.closest('.phase').classList.toggle('open');
+}
+
+function toggleWeek(el) {
+  el.classList.toggle('expanded');
+  el.querySelectorAll('.chevron').forEach(c => {
+    c.style.transform = el.classList.contains('expanded') ? 'rotate(180deg)' : '';
+  });
+}
+
+renderPhases();
+</script>
